@@ -1,8 +1,24 @@
 # Node dependencies
 node_modules/
 
-# Environment variables
+# Environment variables and secrets
 .env
+.env.*
+*.env
+*.secret
+*.key
+*.pem
+*.crt
+*.p12
+*.jks
+*.credentials
+config.js
+config.json
+
+# AWS, Azure, GCP credentials
+.aws/
+.azure/
+.gcp/
 
 # Logs
 *.log
