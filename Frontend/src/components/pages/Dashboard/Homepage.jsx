@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Eye, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AnimatedBackground from "../../ReusableComponets/BackgroundAnimations"; // Import new AnimatedBackground
-import AppLogo from "../../ReusableComponets/AppLogo"; // Import new AppLogo
+import AppLogo from "../../ReusableComponets/AppLogo";
 
 const HomePage = () => {
     const navigate = useNavigate();
@@ -10,11 +10,11 @@ const HomePage = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 relative overflow-hidden">
             {/* Background Animation */}
-            <AnimatedBackground /> {/* Replaced entire background block */}
+            <AnimatedBackground />
             {/* Navigation */}
             <nav className="relative z-40 p-6">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <AppLogo /> {/* Replaced logo and text */}
+                    <AppLogo />
                     <div className="flex items-center space-x-4">
                         <button
                             className="px-6 py-3 text-white border-2 border-gray-600 rounded-full hover:bg-gray-800 hover:border-gray-500 transition-all duration-300 transform hover:scale-105"
@@ -45,9 +45,9 @@ const HomePage = () => {
                         </span>
                     </h1>
                     <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-                        Your personal data deserves military-grade protection.
-                        Store, manage, and control your digital identity with
-                        our advanced encryption vault.
+                        Your personal data deserves military-grade
+                        protection. Store, manage, and control your digital
+                        identity with our advanced encryption vault.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                         <button className="group px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-full font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105 shadow-2xl shadow-cyan-500/20 flex items-center space-x-2">

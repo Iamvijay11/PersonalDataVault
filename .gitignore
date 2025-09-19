@@ -1,51 +1,144 @@
-# ==================================================
-# Node.js Dependencies
-# ==================================================
+# =========================================================================
+# A sensible .gitignore for Node.js projects.
+# https://github.com/github/gitignore/blob/main/Node.gitignore
+# =========================================================================
+
+# Dependencies
+# -------------------------------------------------------------------------
+# Installed dependencies, such as from npm or yarn.
 node_modules/
+
+# Logs
+# -------------------------------------------------------------------------
+# Log files from applications and package managers.
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-# ==================================================
-# Environment Variables
-# ==================================================
-.env
-*.env
+# Project-specific log folder
+Backend/src/logs/
 
-# ==================================================
-# Logs
-# ==================================================
-logs/
-*.log
+# Runtime data
+# -------------------------------------------------------------------------
+# Runtime data, such as process IDs and session files.
+pids/
+*.pid
+*.pid.lock
 
-# ==================================================
-# Build Output
-# ==================================================
-build/
+# Build & Distribution
+# -------------------------------------------------------------------------
+# Compiled or built output files.
 dist/
-dist-ssr/
+build/
+out/
 
-# ==================================================
-# OS / System Files
-# ==================================================
-.DS_Store
-Thumbs.db
+# Framework-specific build outputs
+.next/
+.nuxt/
+storybook-static/
 
-# ==================================================
-# IDE / Editor Files
-# ==================================================
-.vscode/*
-!.vscode/extensions.json
-.idea
+# Caches
+# -------------------------------------------------------------------------
+# Caching directories from various tools.
+.cache/
+.parcel-cache/
+.turbo/
+.vite/
+.eslintcache
+.stylelintcache
+
+# TypeScript
+# -------------------------------------------------------------------------
+# TypeScript build info file.
+*.tsbuildinfo
+
+# Testing
+# -------------------------------------------------------------------------
+# Test runners, coverage reports, and browser testing artifacts.
+coverage/
+.nyc_output/
+test-results/
+blob-report/
+
+# Cypress
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+
+# Playwright
+playwright-report/
+.playwright/
+
+# Databases
+# -------------------------------------------------------------------------
+# Local database files.
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+*-journal
+
+# Environment Variables
+# -------------------------------------------------------------------------
+# Ignore all environment files, but keep templates.
+# Commit .env.example or .env.sample, but not the actual .env files.
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# IDE & Editor Config
+# -------------------------------------------------------------------------
+# Configuration and temporary files from code editors.
+.vscode/
+.idea/
+.vs/
+.history/
+
+# Vim
+*.swp
+*.swo
+*.sw?
+
+# Visual Studio
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
 
-# ==================================================
-# Frontend Specific (React / Vite)
-# ==================================================
-*.local
+# Package Manager Caches
+# -------------------------------------------------------------------------
+# Yarn Berry cache files, keeping essential configs.
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
+# Temporary Files
+# -------------------------------------------------------------------------
+tmp/
+temp/
+.tmp/
+
+# OS Generated Files
+# -------------------------------------------------------------------------
+# System files from macOS, Windows, etc.
+.DS_Store
+Thumbs.db
+
+# Deployment & Cloud Provider Files
+# -------------------------------------------------------------------------
+# Local directories for cloud providers.
+.vercel/
+.netlify/
+.s3-*
+
+# Docker
+# -------------------------------------------------------------------------
+# Local Docker override files.
+docker-compose.override.yml

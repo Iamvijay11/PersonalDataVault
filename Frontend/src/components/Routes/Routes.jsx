@@ -7,13 +7,19 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useState } from "react";
 
 function App() {
-    const [user, setUser] = useState(null); // update this upon login
+    const [user, setUser] = useState(null);
 
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/login" element={<Login onSuccess={setUser} />} />
-                <Route path="/signup" element={<Signup onSuccess={setUser} />} />
+                <Route
+                    path="/login"
+                    element={<Login onSuccess={setUser} />}
+                />
+                <Route
+                    path="/signup"
+                    element={<Signup onSuccess={setUser} />}
+                />
                 <Route
                     path="/dashboard"
                     element={

@@ -1,6 +1,6 @@
 import DB, { T } from "./index.schema.js";
 
-export const PASSWORD_TABLE = "passwords";
+export const PASSWORD_TABLE = "public.passwords";
 
 export const seed = async (dropFirst = false) => {
     try {
@@ -18,7 +18,7 @@ export const seed = async (dropFirst = false) => {
                 .integer("user_id")
                 .notNullable()
                 .references("id")
-                .inTable(T.USER_TABLE)
+                .inTable(T.USERS_TABLE)
                 .onDelete("CASCADE");
 
             table.string("title").notNullable(); // e.g., "Google", "GitHub"

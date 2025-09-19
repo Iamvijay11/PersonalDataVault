@@ -1,58 +1,73 @@
 import jwt from "jsonwebtoken";
 import HttpException from "../exceptions/HttpException.js";
 import DB from "../database/index.schema.js";
+import UserService from "../services/user.service.js";
 
 const authMiddleware = async (req, res, next) => {
-    // console.log("I am running.");
-
     try {
-        //if (req.path.includes('/users/insertusers') || req.path.includes('/public')) {
-        if (req.path.includes("/users/login")) {
-            await DB.raw("SET search_path TO vault");
-            return next();
+        let token;
+
+        // Check token in headers (case-insensitive) or cookies
+        const authHeader = req.headers["authorization"] || req.headers["Authorization"];
+        if (authHeader && authHeader.startsWith("Bearer ")) {
+            token = authHeader.split(" ")[1];
+        } else if (req.cookies?.token) {
+            token = req.cookies.token;
         }
 
-        const bearerHeader = req.headers["authorization"];
-
-        if (bearerHeader) {
-            const bearer = bearerHeader.split(" ");
-            console.log(JSON.stringify(bearer));
-            const bearerToken = bearer[1];
-            console.log(bearerToken);
-            if (bearerToken != "null") {
-                console.log("in if for null");
-                const secret = process.env.JWT_SECRET;
-                const verificationResponse = jwt.verify(bearerToken, secret);
-
-                if (verificationResponse) {
-                    req.user = verificationResponse;
-                    console.log(bearer[2]);
-                    if (bearer[2] != null || bearer[2] != undefined) {
-                        console.log(
-                            DB.raw(
-                                "Hii SET search_path TO " + bearer[2]
-                            ).toString()
-                        );
-                        await DB.raw("SET search_path TO " + bearer[2]);
-                    } else {
-                        console.log("in public");
-                        await DB.raw("SET search_path TO vault");
-                    }
-                    next();
-                } else {
-                    next(new HttpException(401, "UnAuthorized User"));
-                }
-            } else {
-                console.log("inelse");
-                await DB.raw("SET search_path TO " + bearer[2]);
-                next();
-            }
-        } else {
-            next(new HttpException(404, "Authentication token missing"));
+        if (!token) {
+            return res.status(401).json({
+                message: "Access denied. No token provided.",
+            });
         }
+
+        // Verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        if (!decoded || !decoded.id) {
+            return res.status(401).json({
+                message: "Invalid token payload. User identifier is missing.",
+            });
+        }
+
+        // ✅ FIX: Explicitly parse the user ID to an integer and validate it.
+        // This prevents data type mismatches when querying the database.
+        const userId = parseInt(decoded.id, 10);
+        if (isNaN(userId)) {
+            return res.status(401).json({
+                message: "Invalid token. User identifier is malformed.",
+            });
+        }
+
+        // Fetch user using the validated ID
+        const userService = new UserService();
+        const user = await userService.findUserById(userId);
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Invalid token. User not found.",
+            });
+        }
+
+        await DB.raw(`SET search_path TO public`);
+
+        // Attach user to request
+        req.user = user;
+        next();
     } catch (error) {
-        next(new HttpException(401, "Wrong authentication token"));
+        console.error("Auth middleware error:", error.message);
+
+        if (error.name === "TokenExpiredError") {
+            return res.status(401).json({ message: "Token expired. Please log in again." });
+        }
+
+        if (error.name === "JsonWebTokenError") {
+            return res.status(401).json({ message: "Invalid token." });
+        }
+
+        next(new HttpException(401, "Authentication failed."));
     }
 };
 
 export default authMiddleware;
+

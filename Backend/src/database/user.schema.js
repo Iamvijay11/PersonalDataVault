@@ -1,8 +1,8 @@
 import DB from "./index.schema.js";
 
-export const USERS_TABLE = "users";
+export const USERS_TABLE = "public.users";
 
-export const seed = async (dropFirst = true) => {
+export const seed = async (dropFirst = false) => {
     try {
         if (dropFirst) {
             console.log("Dropping Users Table...");

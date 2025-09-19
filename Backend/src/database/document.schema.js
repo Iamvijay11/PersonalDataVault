@@ -1,6 +1,6 @@
 import DB, { T } from "./index.schema.js";
 
-export const DOCUMENTS_TABLE = "documents";
+export const DOCUMENTS_TABLE = "public.documents";
 
 export const seed = async (dropFirst = false) => {
     try {

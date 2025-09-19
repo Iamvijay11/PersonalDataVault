@@ -16,37 +16,39 @@ import AnimatedBackground from "../ReusableComponets/BackgroundAnimations";
 import AppLogo from "../ReusableComponets/AppLogo";
 import Footer from "../Footer/Footer";
 import Modal from "../Modal/Modal";
-import { saveAs } from "file-saver";
 
 const API_BASE_URL = "http://localhost:8000/api/v1";
 
 const createApiClient = () => {
-    const token = localStorage.getItem("token");
     return axios.create({
         baseURL: API_BASE_URL,
-        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
     });
 };
 
 const DocumentsPage = () => {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const navigate = useNavigate();
     const [documents, setDocuments] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [pageLoading, setPageLoading] = useState(true);
     const [error, setError] = useState(null);
 
     // --- State for Modals and Forms ---
     const [showAddModal, setShowAddModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
-    const [newDocument, setNewDocument] = useState({ name: "", category: "" });
+    const [newDocument, setNewDocument] = useState({
+        name: "",
+        category: "",
+    });
     const [selectedFile, setSelectedFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
-    const [downloadingId, setDownloadingId] = useState(null); // State to track which document is downloading
+    const [downloadingId, setDownloadingId] = useState(null);
 
-    // --- Data Fetching ---
     useEffect(() => {
+        if (authLoading) return; // wait for session restore
+
         if (!user) {
             navigate("/login");
             return;
@@ -63,14 +65,13 @@ const DocumentsPage = () => {
                     "Could not load your documents. Please try again later."
                 );
             } finally {
-                setLoading(false);
+                setPageLoading(false);
             }
         };
 
         fetchDocuments();
-    }, [user, navigate]);
+    }, [user, authLoading, navigate]);
 
-    // --- Handlers ---
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewDocument((prev) => ({ ...prev, [name]: value }));
@@ -117,7 +118,9 @@ const DocumentsPage = () => {
             resetAddModal();
         } catch (err) {
             console.error("Failed to upload document:", err);
-            alert(err.response?.data?.message || "Could not upload document.");
+            alert(
+                err.response?.data?.message || "Could not upload document."
+            );
             setIsUploading(false);
         }
     };
@@ -139,11 +142,11 @@ const DocumentsPage = () => {
             setItemToDelete(null);
         } catch (err) {
             console.error("Failed to delete document:", err);
-            alert(err.response?.data?.message || "Could not delete document.");
+            alert(
+                err.response?.data?.message || "Could not delete document."
+            );
         }
     };
-
-    // --- UPDATED: Force Download Handler ---
 
     const handleDownload = (doc) => {
         const link = document.createElement("a");
@@ -176,7 +179,7 @@ const DocumentsPage = () => {
         }
     };
 
-    if (loading) {
+    if (pageLoading) {
         return (
             <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
                 <AnimatedBackground />
@@ -226,7 +229,9 @@ const DocumentsPage = () => {
                     </div>
 
                     {error && (
-                        <p className="text-red-400 text-center mb-4">{error}</p>
+                        <p className="text-red-400 text-center mb-4">
+                            {error}
+                        </p>
                     )}
 
                     {documents.length === 0 && !error ? (
@@ -251,7 +256,8 @@ const DocumentsPage = () => {
                                     doc.file_type === "application/pdf";
                                 const isWord =
                                     doc.file_type &&
-                                    (doc.file_type === "application/msword" ||
+                                    (doc.file_type ===
+                                        "application/msword" ||
                                         doc.file_type ===
                                             "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
 
@@ -416,7 +422,8 @@ const DocumentsPage = () => {
                                 htmlFor="category"
                                 className="block text-gray-300 text-sm font-medium mb-2"
                             >
-                                Category <span className="text-red-500">*</span>
+                                Category{" "}
+                                <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"

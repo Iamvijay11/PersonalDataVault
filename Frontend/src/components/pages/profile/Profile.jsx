@@ -19,12 +19,9 @@ const API_BASE_URL = "http://localhost:8000/api/v1";
 
 // Helper to create an authenticated axios instance
 const createApiClient = () => {
-    const token = localStorage.getItem("token");
     return axios.create({
         baseURL: API_BASE_URL,
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+        withCredentials: true,
     });
 };
 
@@ -104,10 +101,7 @@ const ProfilePage = () => {
 
         try {
             const apiClient = createApiClient();
-            const res = await apiClient.put(
-                `/users/update/${user.id}`,
-                formData
-            );
+            const res = await apiClient.put(`/users/update`, formData);
 
             const updatedUser = res.data.data;
 
@@ -123,7 +117,7 @@ const ProfilePage = () => {
             setMessage({
                 type: "error",
                 text:
-                    error.response?.data?.message ||
+                    error.response.data.message ||
                     "Failed to update profile.",
             });
             setEditProfile(userProfile);
@@ -190,9 +184,12 @@ const ProfilePage = () => {
                             className="w-32 h-32 rounded-full object-cover border-4 border-cyan-500 shadow-lg mb-4"
                         />
                         <h2 className="text-3xl font-semibold text-white">
-                            {userProfile.first_name} {userProfile.last_name}
+                            {userProfile.first_name}{" "}
+                            {userProfile.last_name}
                         </h2>
-                        <p className="text-gray-400">{userProfile.email}</p>
+                        <p className="text-gray-400">
+                            {userProfile.email}
+                        </p>
                     </div>
 
                     <form

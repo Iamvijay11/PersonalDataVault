@@ -7,24 +7,46 @@ Built with a focus on **data security, privacy, and ease of access**, making it 
 
 ## 🚀 Features
 
-- **User Authentication & Authorization**
-  - Secure **JWT-based authentication** with cookies
-  - Role-based route protection (frontend + backend)
+-   **User Authentication & Authorization**
 
-- **Secure Password Storage**
-  - User passwords hashed using **bcrypt** before storing in PostgreSQL
+    -   Secure **JWT-based authentication** with cookies
+    -   Role-based route protection (frontend + backend)
 
-- **Document & File Management**
-  - Upload, view, and manage files securely
-  - Files stored in **AWS S3 bucket**, with metadata in PostgreSQL
+-   **Secure Password Storage**
 
-- **Protected Dashboard**
-  - Accessible only after login
-  - Displays user profile, uploaded documents, and account details
+    -   User passwords hashed using **bcrypt** before storing in PostgreSQL
 
-- **Modern UI**
-  - Built with **React + Tailwind CSS**
-  - Smooth authentication flows (signup, login, logout, file upload, profile view)
+-   **Document & File Management**
+
+    -   Upload, view, and manage files securely
+    -   Files stored in **AWS S3 bucket**, with metadata in PostgreSQL
+
+-   **Protected Dashboard**
+
+    -   Accessible only after login
+    -   Displays user profile, uploaded documents, and account details
+
+-   **Modern UI**
+    -   Built with **React + Tailwind CSS**
+    -   Smooth authentication flows (signup, login, logout, file upload, profile view)
+
+---
+
+## 🔑 Passwords API
+
+-   `GET /api/v1/passwords`
+    -   Returns list: `id`, `title`, `website_url`, `email_or_username`. No plaintext passwords.
+-   `POST /api/v1/passwords/add`
+    -   Body: `{ website, username, password }` (stored encrypted)
+-   `DELETE /api/v1/passwords/delete/:id`
+-   `POST /api/v1/passwords/reveal/:id`
+    -   Body: `{ email }` — must match the logged-in user email
+    -   Returns: `{ password }` decrypted (server-side verification)
+
+Frontend Passwords page now:
+
+-   Lists entries without passwords.
+-   Shows password only after verifying email in a modal, per entry.
 
 ---
 
@@ -34,12 +56,11 @@ Built with a focus on **data security, privacy, and ease of access**, making it 
 **Backend:** Node.js, Express.js, TypeScript (class-based services/controllers)  
 **Database:** PostgreSQL  
 **Storage:** AWS S3 Bucket  
-**Authentication:** JWT + Cookies, bcrypt password hashing  
+**Authentication:** JWT + Cookies, bcrypt password hashing
 
 ---
 
 ## 📂 Project Structure
-
 
 personal-data-vault/
 │── backend/ # Node.js + Express backend
@@ -60,7 +81,6 @@ personal-data-vault/
 │
 └── README.md
 
-
 ---
 
 ## ⚙️ Setup & Installation
@@ -72,7 +92,7 @@ cd backend
 npm install
 
 create a .env inside backend/:
-PORT=8080
+PORT=8000
 DATABASE_URL=postgresql://username:password@localhost:5432/vaultdb
 JWT_SECRET=your_secret_key
 JWT_EXPIRES_IN=1d
@@ -91,3 +111,4 @@ npm install
 
 Run the frontend server:
 npm run dev
+```

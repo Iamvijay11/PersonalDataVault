@@ -11,6 +11,7 @@ export default class UserController {
     registerUser = async (req, res, next) => {
         try {
             const userData = req.body;
+            console.log("User registration attempt:", userData);
 
             if (!userData.password) {
                 throw new HttpException(400, "Password is missing");
@@ -32,8 +33,6 @@ export default class UserController {
         try {
             const userData = req.body;
 
-            console.log(userData.identifier);
-
             const user = await this.userService.login(userData);
 
             // ✅ Generate token
@@ -44,14 +43,14 @@ export default class UserController {
             );
 
             // ✅ Set HTTP-only cookie
-            res.cookie("Authorization", token, {
+            res.cookie("token", token, {
                 httpOnly: true,
                 maxAge: 24 * 60 * 60 * 1000, // 1 day
-                secure: false,
-                sameSite: "lax",
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "Lax",
             });
 
-            // ✅ Return user (optional)
+            // ✅ Return user (optional) - REMOVED token from response
             res.status(200).json({
                 message: "Login successful",
                 token,
@@ -65,10 +64,10 @@ export default class UserController {
     };
 
     logoutUser = async (req, res) => {
-        res.clearCookie("Authorization", {
+        res.clearCookie("token", {
             httpOnly: true,
-            sameSite: "lax",
-            secure: false,
+            sameSite: "strict",
+            secure: process.env.NODE_ENV === "production",
         });
         res.status(200).json({ message: "Logged out successfully" });
     };

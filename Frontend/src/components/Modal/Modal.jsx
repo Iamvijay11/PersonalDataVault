@@ -1,4 +1,4 @@
-import { X } from "lucide-react"; // THE FIX: Import the 'X' icon
+import { X } from "lucide-react";
 
 const Modal = ({
     title,

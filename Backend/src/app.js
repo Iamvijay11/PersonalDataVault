@@ -37,7 +37,7 @@ class App {
 
     listen() {
         this.app.listen(this.port, () => {
-            console.log(`✅ App listening on the port ${this.port}...`);
+            console.log(`App listening on the port ${this.port}...`);
         });
     }
 
@@ -49,24 +49,25 @@ class App {
         // ✅ JSON parser must be first
         this.app.use(express.json({ limit: "2gb" }));
         this.app.use(express.urlencoded({ limit: "2gb", extended: true }));
+        this.app.use(cookieParser());
 
         // ✅ Security & logging middlewares
         this.app.use(hpp());
         this.app.use(helmet());
         this.app.use(compression());
         this.app.use(
-            morgan(this.env === "production" ? "combined" : "dev", { stream })
+            morgan(this.env === "production" ? "combined" : "dev", {
+                stream,
+            })
         );
         this.app.use(passport.initialize());
     }
 
     initializeRoutes(routes) {
-        // ✅ Mount all routes BEFORE global auth middleware
         routes.forEach((route) => {
             this.app.use("/api/v1", route.router);
         });
 
-        // 🛡 Optional: Apply auth globally to all `/api/v1` routes *after* open ones (like login/signup)
         this.app.use("/api/v1", authMiddleware);
     }
 

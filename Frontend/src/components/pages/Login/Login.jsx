@@ -8,6 +8,8 @@ import AnimatedBackground from "../../ReusableComponets/BackgroundAnimations";
 const API_URL = "http://localhost:8000/api/v1/users";
 const GOOGLE_API_URL = "http://localhost:8000/api/v1/auth/google";
 
+axios.defaults.withCredentials = true;
+
 const LoginPage = () => {
     const [formData, setFormData] = useState({
         identifier: "",
@@ -28,40 +30,36 @@ const LoginPage = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const payload = {
-            identifier: formData.identifier,
-            password: formData.password,
-        };
-
-        if (!payload.password || !payload.identifier) {
+        if (!formData.identifier || !formData.password) {
             console.error("Username/Email and password are required");
             return;
         }
+
         try {
             const res = await axios.post(
                 `${API_URL}/login`,
-                { userData: payload },
+                { userData: formData },
                 {
                     headers: { "Content-Type": "application/json" },
-                    withCredentials: true,
                 }
             );
 
-            localStorage.setItem("token", res.data.token);
             setUser(res.data.data);
+
             console.log("Login Successful");
             navigate("/dashboard");
         } catch (error) {
-            console.error("Login error:", error);
-            console.error(error?.response?.data?.message || "Login failed");
+            console.error(
+                "Login error:",
+                error.response.data.message || "Login failed"
+            );
         }
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 relative overflow-hidden flex items-center justify-center p-4">
-            {/* Background Animation */}
-            <AnimatedBackground /> {/* Replaced entire background block */}
-            {/* Login Form */}
+            <AnimatedBackground />
+
             <div className="relative z-10 w-full max-w-md p-8 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl animate-fade-in-up">
                 <div className="flex justify-center mb-6">
                     <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/30">
@@ -138,7 +136,6 @@ const LoginPage = () => {
                     }}
                     className="group w-full flex items-center justify-center px-8 py-3 border border-gray-600 rounded-full text-white font-semibold hover:bg-gray-800 hover:border-gray-500 transition-all duration-300 transform hover:scale-105 space-x-3"
                 >
-                    {/* Google Icon SVG */}
                     <svg
                         className="w-5 h-5"
                         viewBox="0 0 24 24"

@@ -16,7 +16,8 @@ export default class UserService {
 
         const { password, ...data } = userData;
 
-        if (!password) throw new HttpException(400, "Password is required");
+        if (!password)
+            throw new HttpException(400, "Password is required");
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -25,7 +26,9 @@ export default class UserService {
             password_hash: hashedPassword,
         };
 
-        const result = await DB(T.USERS_TABLE).insert(newUser).returning("*");
+        const result = await DB(T.USERS_TABLE)
+            .insert(newUser)
+            .returning("*");
 
         return result[0];
     }
@@ -41,6 +44,7 @@ export default class UserService {
                 "Email/Username and password are required"
             );
         }
+        console.log("User login attempt:", { identifier });
 
         const user = await DB(T.USERS_TABLE)
             .where("email", identifier)
@@ -63,11 +67,20 @@ export default class UserService {
     }
 
     async findUserById(user_id) {
-        const user = await DB(T.USERS_TABLE).where(user_id).first();
+        // Accept either a primitive id or a where-hash object
+        const criteria =
+            user_id && typeof user_id === "object"
+                ? user_id
+                : { id: user_id };
+
+        const user = await DB(T.USERS_TABLE).where(criteria).first();
 
         if (!user) {
             return null;
         }
+
+        // Remove sensitive fields if present
+        delete user.password_hash;
         return user;
     }
 
@@ -80,12 +93,12 @@ export default class UserService {
             throw new HttpException(400, "User update data are required");
         }
 
-        // ❌ Restrict email from being updated
+        //  Restrict email from being updated
         if (updateData.email) {
             throw new HttpException(400, "Email update is not allowed");
         }
 
-        // ❌ Prevent direct password update
+        //  Prevent direct password update
         if (updateData.password || updateData.password_hash) {
             throw new HttpException(
                 400,
@@ -117,7 +130,10 @@ export default class UserService {
             .returning("*");
 
         if (!updated.length) {
-            throw new HttpException(404, "User not found or update failed");
+            throw new HttpException(
+                404,
+                "User not found or update failed"
+            );
         }
 
         delete updated[0].password_hash; // Remove sensitive field
@@ -127,7 +143,10 @@ export default class UserService {
     async deleteUser(id) {
         const deleted = await DB(T.USERS_TABLE).where({ id }).del();
         if (!deleted)
-            throw new HttpException(404, "User not found or already deleted");
+            throw new HttpException(
+                404,
+                "User not found or already deleted"
+            );
         return { message: "User deleted successfully" };
     }
 }

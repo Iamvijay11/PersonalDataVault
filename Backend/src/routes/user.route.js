@@ -16,16 +16,11 @@ export default class UserRoute {
         // User Signup
         this.router.post(
             `${this.path}/signup`,
-            authMiddleware,
             this.controller.registerUser
         );
 
         //User Login
-        this.router.post(
-            `${this.path}/login`,
-            authMiddleware,
-            this.controller.loginUser
-        );
+        this.router.post(`${this.path}/login`, this.controller.loginUser);
 
         // Current User
         this.router.get(
@@ -36,13 +31,16 @@ export default class UserRoute {
 
         // update profile
         this.router.put(
-            `${this.path}/update/:id`,
+            `${this.path}/update`,
             authMiddleware,
             upload.single("profile_image_url"),
             this.controller.updateUser
         );
 
         // User Logout
-        this.router.post(`${this.path}/logout`, this.controller.logoutUser);
+        this.router.post(
+            `${this.path}/logout`,
+            this.controller.logoutUser
+        );
     }
 }

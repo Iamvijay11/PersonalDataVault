@@ -10,37 +10,27 @@ import Footer from "../Footer/Footer";
 const API_BASE_URL = "http://localhost:8000/api/v1";
 
 const DashboardPage = () => {
-    const { user, setUser } = useAuth();
+    const { user, setUser, loading: authLoading } = useAuth();
     const navigate = useNavigate();
 
-    // --- State Management ---
     const [userProfile, setUserProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [showUserDropdown, setShowUserDropdown] = useState(false);
     const dropdownRef = useRef(null);
 
-    // This effect processes the user data from the context
     useEffect(() => {
-        // If the context is still loading, the user will be null.
-        // If it has loaded and user is still null, then they are not authenticated.
+        if (authLoading) return; // wait for session restore
+
         if (!user) {
-            const timer = setTimeout(() => {
-                // Double-check after a brief moment to ensure context had time to load
-                if (!user) {
-                    navigate("/login");
-                }
-            }, 500); // A small delay can prevent premature redirects
-            return () => clearTimeout(timer);
+            navigate("/login");
+            return;
         }
 
-        // If the user object exists, create an enhanced profile for the UI
         const enhancedProfile = {
             ...user,
             fullName: `${user.first_name || ""} ${user.last_name || ""}`.trim(),
         };
         setUserProfile(enhancedProfile);
-        setLoading(false); // Stop loading once the profile is set
-    }, [user, navigate]);
+    }, [user, authLoading, navigate]);
 
     // --- UI Effects ---
     useEffect(() => {
@@ -61,21 +51,13 @@ const DashboardPage = () => {
     // --- Action Handlers ---
     const handleLogout = async () => {
         try {
-            const token = localStorage.getItem("token");
-            await axios.post(
-                `${API_BASE_URL}/users/logout`,
-                {},
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+            await axios.post(`${API_BASE_URL}/users/logout`);
         } catch (err) {
             console.error(
                 "Backend logout failed, proceeding with client-side logout:",
                 err
             );
         } finally {
-            localStorage.removeItem("token");
             setUser(null);
             navigate("/login");
         }
@@ -87,7 +69,7 @@ const DashboardPage = () => {
     };
 
     // --- Conditional Render for Loading State ---
-    if (loading) {
+    if (authLoading) {
         return (
             <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white text-xl">
                 <AnimatedBackground />
@@ -123,8 +105,7 @@ const DashboardPage = () => {
                                 <img
                                     src={
                                         userProfile?.profile_image_url ||
-                                        `https://ui-avatars.com/api/?name=${
-                                            userProfile?.fullName || "User"
+                                        `https://ui-avatars.com/api/?name=${userProfile?.fullName || "User"
                                         }&background=1e293b&color=cbd5e1`
                                     }
                                     alt="User Avatar"
@@ -135,9 +116,8 @@ const DashboardPage = () => {
                                 </span>
                                 <ChevronDown
                                     size={18}
-                                    className={`transition-transform duration-200 ${
-                                        showUserDropdown ? "rotate-180" : ""
-                                    }`}
+                                    className={`transition-transform duration-200 ${showUserDropdown ? "rotate-180" : ""
+                                        }`}
                                 />
                             </button>
                             {showUserDropdown && (
